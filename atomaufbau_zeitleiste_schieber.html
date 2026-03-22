@@ -1,0 +1,438 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{font-family:var(--font-sans);padding:1.5rem 1rem 2rem}
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.year-badge{font-size:22px;font-weight:500;color:var(--color-text-primary);min-width:110px;text-align:right}
+.era-pill{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.card-outer{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);overflow:hidden;transition:opacity .25s}
+.card-top{display:flex;gap:0;align-items:stretch}
+.model-vis{flex:0 0 260px;min-height:260px;display:flex;align-items:center;justify-content:center;border-right:0.5px solid var(--color-border-tertiary)}
+.card-info{flex:1;padding:1.25rem 1.25rem 1rem}
+.card-name{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.card-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:12px}
+.card-body{font-size:14px;line-height:1.7;color:var(--color-text-secondary)}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;margin-bottom:10px}
+.nav-row{display:flex;align-items:center;justify-content:space-between;margin-top:1rem}
+.nav-btn{font-size:13px;padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.nav-btn:disabled{opacity:0.3;cursor:default}
+.dots{display:flex;gap:6px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--color-border-primary);transition:all .2s;cursor:pointer}
+.dot.active{width:8px;height:8px;background:var(--color-text-secondary)}
+.ask-btn{font-size:12px;margin-top:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;display:inline-block}
+.ask-btn:hover{background:var(--color-background-secondary)}
+</style>
+
+<div class="wrap">
+  <div class="slider-row">
+    <input type="range" id="tslider" min="0" max="8" step="1" value="0" style="flex:1">
+    <div class="year-badge" id="ybadge">~450 v. Chr.</div>
+    <div class="era-pill" id="epill" style="background:#EEEDFE;color:#3C3489">Antike</div>
+  </div>
+  <div class="card-outer" id="maincard">
+    <div class="card-top">
+      <div class="model-vis" id="visarea"></div>
+      <div class="card-info">
+        <div class="tag" id="ctag"></div>
+        <div class="card-name" id="cname"></div>
+        <div class="card-sub" id="csub"></div>
+        <div class="card-body" id="cbody"></div>
+        <button class="ask-btn" id="askbtn" onclick="askMore()"></button>
+      </div>
+    </div>
+    <div class="nav-row" style="padding:0 1.25rem 1rem">
+      <button class="nav-btn" id="prevbtn" onclick="go(-1)">&#8592; zurück</button>
+      <div class="dots" id="dotrow"></div>
+      <button class="nav-btn" id="nextbtn" onclick="go(1)">weiter &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const models = [
+  {
+    year:"~450 v. Chr.", era:"Antike", eraColor:"#EEEDFE", eraText:"#3C3489",
+    tag:"Philosophie", tagBg:"#EEEDFE", tagText:"#3C3489",
+    name:"Demokrit — Atomhypothese",
+    sub:"Unteilbare Ur-Teilchen im leeren Raum",
+    body:"Demokrit und Leukipp postulierten, dass alle Materie aus winzigen, unteilbaren Teilchen (ἄτομος = unteilbar) besteht, die sich durch den leeren Raum bewegen. Alles Sichtbare entsteht durch ihre Anordnung und Bewegung. Diese rein philosophische Idee hatte keine experimentelle Grundlage — war aber für die Wissenschaftsgeschichte fundamental.",
+    ask:"Erkläre Demokrits Atomhypothese genauer",
+    draw: drawDemokrit
+  },
+  {
+    year:"~350 v. Chr.", era:"Antike", eraColor:"#EEEDFE", eraText:"#3C3489",
+    tag:"Philosophie", tagBg:"#EEEDFE", tagText:"#3C3489",
+    name:"Aristoteles — Vier-Elemente-Lehre",
+    sub:"Feuer, Wasser, Erde, Luft als Grundstoffe",
+    body:"Aristoteles verwarf die Atomtheorie und ersetzte sie durch vier Grundelemente sowie einen fünften Stoff (Äther) für den Himmel. Diese Vorstellung dominierte über 2000 Jahre lang die europäische Naturphilosophie und hemmte die Entwicklung der Chemie erheblich.",
+    ask:"Erkläre Aristoteles Vier-Elemente-Lehre im Unterricht",
+    draw: drawAristoteles
+  },
+  {
+    year:"1803", era:"Frühe Chemie", eraColor:"#E6F1FB", eraText:"#0C447C",
+    tag:"Chemie", tagBg:"#E6F1FB", tagText:"#0C447C",
+    name:"Dalton — Billardkugelmodell",
+    sub:"Atome als massive, unteilbare Kugeln",
+    body:"John Dalton begründete die moderne Atomtheorie: Atome sind harte, unteilbare Kugeln ohne Substruktur. Jedes Element hat identische Atome, Verbindungen entstehen durch ganzzahlige Verhältnisse. Das erste empirisch gestützte Atommodell, basierend auf Gesetzen konstanter und multipler Proportionen.",
+    ask:"Erkläre Daltons Atommodell und seine historische Bedeutung",
+    draw: drawDalton
+  },
+  {
+    year:"1897", era:"Substruktur", eraColor:"#E1F5EE", eraText:"#085041",
+    tag:"Physik", tagBg:"#E1F5EE", tagText:"#085041",
+    name:"Thomson — Rosinenkuchenmodell",
+    sub:"Elektronen in positiver Ladungswolke",
+    body:"J. J. Thomson entdeckte das Elektron mit der Kathodenstrahlröhre. Sein Modell: negative Elektronen sind wie Rosinen gleichmäßig in einem positiv geladenen Teig eingebettet. Das Atom ist erstmals nicht mehr unteilbar — eine wissenschaftliche Revolution.",
+    ask:"Erkläre Thomsons Rosinenkuchenmodell anschaulich",
+    draw: drawThomson
+  },
+  {
+    year:"1911", era:"Substruktur", eraColor:"#E1F5EE", eraText:"#085041",
+    tag:"Physik", tagBg:"#E1F5EE", tagText:"#085041",
+    name:"Rutherford — Kernmodell",
+    sub:"Kleiner, schwerer Kern im leeren Raum",
+    body:"Rutherfords Goldfolienversuch zeigte: Fast alle Atommasse sitzt in einem winzigen positiven Kern. Elektronen umkreisen ihn in großem Abstand — das Atom ist zu 99,99 % leerer Raum. Das Rosinenkuchenmodell war damit widerlegt.",
+    ask:"Erkläre Rutherfords Streuversuch als Unterrichtsexperiment",
+    draw: drawRutherford
+  },
+  {
+    year:"1913", era:"Quantenphysik", eraColor:"#FAEEDA", eraText:"#633806",
+    tag:"Quantenphysik", tagBg:"#FAEEDA", tagText:"#633806",
+    name:"Bohr — Schalenmodell",
+    sub:"Elektronen auf erlaubten Kreisbahnen",
+    body:"Niels Bohr kombinierte Rutherfords Kern mit Plancks Quantenidee: Elektronen bewegen sich auf bestimmten Schalen (K, L, M …). Energieabsorption/-emission = Schalensprung. Erklärt das Wasserstoffspektrum quantitativ. Grundlage für das Konzept der Energieniveaus.",
+    ask:"Erkläre das Bohr-Modell mit Energieniveaus für Klasse 9",
+    draw: drawBohr
+  },
+  {
+    year:"1926", era:"Quantenmechanik", eraColor:"#FAEEDA", eraText:"#633806",
+    tag:"Quantenmechanik", tagBg:"#FAEEDA", tagText:"#633806",
+    name:"Schrödinger — Orbitalmodell",
+    sub:"Elektronen als Wahrscheinlichkeitswolken",
+    body:"Elektronen haben Wellencharakter (de Broglie). Schrödinger löste die Wellengleichung: Elektronen existieren als Aufenthaltswahrscheinlichkeiten (Orbitale: s, p, d, f). Keine festen Bahnen mehr — nur Dichteverteilungen. Heisenbergs Unschärferelation: Ort und Impuls sind prinzipiell unbestimmt.",
+    ask:"Erkläre Orbitale und Quantenzahlen für die Oberstufe",
+    draw: drawSchroedinger
+  },
+  {
+    year:"1932", era:"Kernphysik", eraColor:"#FCEBEB", eraText:"#791F1F",
+    tag:"Kernphysik", tagBg:"#FCEBEB", tagText:"#791F1F",
+    name:"Chadwick — Kernbausteine",
+    sub:"Protonen + Neutronen + Elektronen",
+    body:"James Chadwick entdeckte das Neutron. Das vollständige Atombild: Protonen (p⁺) und Neutronen (n⁰) im Kern, Elektronen in Orbitalen. Isotope erklärt. Kern wird durch die starke Wechselwirkung zusammengehalten — Grundlage für Kernspaltung und Reaktortechnik.",
+    ask:"Erkläre Isotope und Kernbausteine für Klasse 10",
+    draw: drawKernbau
+  },
+  {
+    year:"1964 – heute", era:"Teilchenphysik", eraColor:"#FAECE7", eraText:"#993C1D",
+    tag:"Teilchenphysik", tagBg:"#FAECE7", tagText:"#993C1D",
+    name:"Standardmodell — Quarks & Leptonen",
+    sub:"Protonen aus je 3 Quarks aufgebaut",
+    body:"Gell-Manns Quarkmodell: Protonen und Neutronen bestehen aus je 3 Quarks (uud / udd). Das Standardmodell beschreibt 17 fundamentale Teilchen — Quarks, Leptonen, Bosonen. Das Higgs-Boson (CERN 2012) vervollständigt es. Gravitation bleibt noch unintegriert.",
+    ask:"Erkläre das Standardmodell und Quarks für die Oberstufe",
+    draw: drawStandardmodell
+  }
+];
+
+let cur = 0;
+
+function drawDemokrit(svg){
+  const cx=130,cy=130,r=16;
+  const positions=[[cx,cy],[cx-38,cy-30],[cx+42,cy-28],[cx-50,cy+20],[cx+30,cy+38],[cx-20,cy+52],[cx+55,cy+15],[cx-55,cy-5]];
+  positions.forEach(([x,y],i)=>{
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",x);c.setAttribute("cy",y);
+    c.setAttribute("r",i===0?r:r*0.75);
+    c.setAttribute("fill",i===0?"#534AB7":"#AFA9EC");
+    c.setAttribute("opacity","0.85");
+    svg.appendChild(c);
+  });
+  addLabel(svg,130,240,"leere Raum zwischen Atomen");
+}
+function drawAristoteles(svg){
+  const els=[["Feuer","#E24B4A",50,50,80,80],["Luft","#378ADD",130,50,80,80],["Wasser","#1D9E75",50,140,80,80],["Erde","#BA7517",130,140,80,80]];
+  els.forEach(([n,c,x,y,w,h])=>{
+    const r=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    r.setAttribute("x",x);r.setAttribute("y",y);r.setAttribute("width",w);r.setAttribute("height",h);
+    r.setAttribute("rx","8");r.setAttribute("fill",c);r.setAttribute("opacity","0.25");
+    svg.appendChild(r);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",x+w/2);t.setAttribute("y",y+h/2+1);
+    t.setAttribute("text-anchor","middle");t.setAttribute("dominant-baseline","central");
+    t.setAttribute("font-size","14");t.setAttribute("font-weight","500");
+    t.setAttribute("fill",c);t.textContent=n;
+    svg.appendChild(t);
+  });
+  addLabel(svg,130,248,"4 Grundelemente nach Aristoteles");
+}
+function drawDalton(svg){
+  const cx=130,cy=120,R=85;
+  const big=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  big.setAttribute("cx",cx);big.setAttribute("cy",cy);big.setAttribute("r",R);
+  big.setAttribute("fill","#185FA5");big.setAttribute("opacity","0.18");
+  svg.appendChild(big);
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx",cx);c.setAttribute("cy",cy);c.setAttribute("r",R);
+  c.setAttribute("fill","none");c.setAttribute("stroke","#185FA5");c.setAttribute("stroke-width","1.5");
+  svg.appendChild(c);
+  const dot=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  dot.setAttribute("cx",cx);dot.setAttribute("cy",cy);dot.setAttribute("r","6");
+  dot.setAttribute("fill","#0C447C");
+  svg.appendChild(dot);
+  addLabel(svg,130,236,"massive, unteilbare Kugel (Dalton 1803)");
+}
+function drawThomson(svg){
+  const cx=130,cy=120,R=85;
+  const big=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  big.setAttribute("cx",cx);big.setAttribute("cy",cy);big.setAttribute("r",R);
+  big.setAttribute("fill","#185FA5");big.setAttribute("opacity","0.15");
+  svg.appendChild(big);
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx",cx);c.setAttribute("cy",cy);c.setAttribute("r",R);
+  c.setAttribute("fill","none");c.setAttribute("stroke","#185FA5");c.setAttribute("stroke-width","1");
+  svg.appendChild(c);
+  const epos=[[cx,cy-55],[cx+45,cy-30],[cx+52,cy+18],[cx+20,cy+55],[cx-30,cy+52],[cx-55,cy+10],[cx-48,cy-35],[cx-10,cy+20],[cx+25,cy+10]];
+  epos.forEach(([ex,ey])=>{
+    const e=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    e.setAttribute("cx",ex);e.setAttribute("cy",ey);e.setAttribute("r","7");
+    e.setAttribute("fill","#E24B4A");e.setAttribute("opacity","0.85");
+    svg.appendChild(e);
+    const minus=document.createElementNS("http://www.w3.org/2000/svg","text");
+    minus.setAttribute("x",ex);minus.setAttribute("y",ey+1);
+    minus.setAttribute("text-anchor","middle");minus.setAttribute("dominant-baseline","central");
+    minus.setAttribute("font-size","10");minus.setAttribute("fill","#fff");minus.textContent="−";
+    svg.appendChild(minus);
+  });
+  addLabel(svg,130,236,"Elektronen (−) in positiver Ladungsmasse");
+}
+function drawRutherford(svg){
+  const cx=130,cy=120;
+  const nuc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  nuc.setAttribute("cx",cx);nuc.setAttribute("cy",cy);nuc.setAttribute("r","12");
+  nuc.setAttribute("fill","#D85A30");
+  svg.appendChild(nuc);
+  const nucT=document.createElementNS("http://www.w3.org/2000/svg","text");
+  nucT.setAttribute("x",cx);nucT.setAttribute("y",cy+1);
+  nucT.setAttribute("text-anchor","middle");nucT.setAttribute("dominant-baseline","central");
+  nucT.setAttribute("font-size","9");nucT.setAttribute("fill","#fff");nucT.textContent="Kern";
+  svg.appendChild(nucT);
+  const radii=[55,80];
+  radii.forEach((r,i)=>{
+    const orb=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    orb.setAttribute("cx",cx);orb.setAttribute("cy",cy);orb.setAttribute("r",r);
+    orb.setAttribute("fill","none");orb.setAttribute("stroke","#888780");orb.setAttribute("stroke-width","0.8");orb.setAttribute("stroke-dasharray","4 3");
+    svg.appendChild(orb);
+    const ex=cx+r,ey=cy;
+    const e=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    e.setAttribute("cx",ex);e.setAttribute("cy",ey);e.setAttribute("r","6");
+    e.setAttribute("fill","#E24B4A");
+    svg.appendChild(e);
+    const em=document.createElementNS("http://www.w3.org/2000/svg","text");
+    em.setAttribute("x",ex);em.setAttribute("y",ey+1);
+    em.setAttribute("text-anchor","middle");em.setAttribute("dominant-baseline","central");
+    em.setAttribute("font-size","9");em.setAttribute("fill","#fff");em.textContent="e−";
+    svg.appendChild(em);
+  });
+  addLabel(svg,130,236,"kleiner Kern (+), Elektronen in Bahnen");
+}
+function drawBohr(svg){
+  const cx=130,cy=115;
+  const nuc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  nuc.setAttribute("cx",cx);nuc.setAttribute("cy",cy);nuc.setAttribute("r","16");
+  nuc.setAttribute("fill","#D85A30");
+  svg.appendChild(nuc);
+  const nucT=document.createElementNS("http://www.w3.org/2000/svg","text");
+  nucT.setAttribute("x",cx);nucT.setAttribute("y",cy+1);
+  nucT.setAttribute("text-anchor","middle");nucT.setAttribute("dominant-baseline","central");
+  nucT.setAttribute("font-size","9");nucT.setAttribute("fill","#fff");nucT.textContent="p⁺n⁰";
+  svg.appendChild(nucT);
+  const shells=[{r:38,n:2,label:"K"},{r:65,n:8,label:"L"},{r:92,n:3,label:"M"}];
+  shells.forEach(({r,n,label})=>{
+    const orb=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    orb.setAttribute("cx",cx);orb.setAttribute("cy",cy);orb.setAttribute("r",r);
+    orb.setAttribute("fill","none");orb.setAttribute("stroke","#BA7517");orb.setAttribute("stroke-width","1");
+    svg.appendChild(orb);
+    const lt=document.createElementNS("http://www.w3.org/2000/svg","text");
+    lt.setAttribute("x",cx+r+5);lt.setAttribute("y",cy-3);
+    lt.setAttribute("font-size","11");lt.setAttribute("fill","#BA7517");lt.setAttribute("opacity","0.8");
+    lt.textContent=label;svg.appendChild(lt);
+    for(let i=0;i<n;i++){
+      const angle=(2*Math.PI*i/n)-Math.PI/2;
+      const ex=cx+r*Math.cos(angle),ey=cy+r*Math.sin(angle);
+      const e=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      e.setAttribute("cx",ex.toFixed(1));e.setAttribute("cy",ey.toFixed(1));e.setAttribute("r","5");
+      e.setAttribute("fill","#E24B4A");
+      svg.appendChild(e);
+    }
+  });
+  addLabel(svg,130,238,"Schalen K, L, M mit Elektronenbesetzung");
+}
+function drawSchroedinger(svg){
+  const cx=130,cy=120;
+  const nuc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  nuc.setAttribute("cx",cx);nuc.setAttribute("cy",cy);nuc.setAttribute("r","10");
+  nuc.setAttribute("fill","#D85A30");
+  svg.appendChild(nuc);
+  for(let i=0;i<320;i++){
+    const angle=Math.random()*2*Math.PI;
+    const rr=Math.random()<0.6?(25+Math.random()*30):(60+Math.random()*30);
+    const dx=Math.random()*8-4,dy=Math.random()*8-4;
+    const ex=cx+rr*Math.cos(angle)+dx,ey=cy+(rr*0.55)*Math.sin(angle)+dy;
+    if(ex<10||ex>250||ey<10||ey>230)continue;
+    const d=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    d.setAttribute("cx",ex.toFixed(1));d.setAttribute("cy",ey.toFixed(1));d.setAttribute("r","1.8");
+    const alpha=(0.08+Math.random()*0.35).toFixed(2);
+    d.setAttribute("fill","#E24B4A");d.setAttribute("opacity",alpha);
+    svg.appendChild(d);
+  }
+  addLabel(svg,130,240,"Aufenthaltswahrscheinlichkeit (p-Orbital)");
+}
+function drawKernbau(svg){
+  const cx=130,cy=100,nucR=38;
+  const bg=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  bg.setAttribute("cx",cx);bg.setAttribute("cy",cy);bg.setAttribute("r",nucR+4);
+  bg.setAttribute("fill","#D85A30");bg.setAttribute("opacity","0.12");
+  svg.appendChild(bg);
+  const protons=[[cx-12,cy-14],[cx+10,cy-18],[cx-18,cy+4],[cx+16,cy+2],[cx-6,cy+18],[cx+4,cy-4]];
+  const neutrons=[[cx-8,cy-28],[cx+20,cy-10],[cx+22,cy+15],[cx-20,cy+18],[cx+8,cy+26],[cx-22,cy-8]];
+  protons.forEach(([px,py])=>{
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",px);c.setAttribute("cy",py);c.setAttribute("r","10");c.setAttribute("fill","#D85A30");
+    svg.appendChild(c);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",px);t.setAttribute("y",py+1);t.setAttribute("text-anchor","middle");
+    t.setAttribute("dominant-baseline","central");t.setAttribute("font-size","9");t.setAttribute("fill","#fff");
+    t.textContent="p⁺";svg.appendChild(t);
+  });
+  neutrons.forEach(([nx,ny])=>{
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",nx);c.setAttribute("cy",ny);c.setAttribute("r","10");c.setAttribute("fill","#888780");
+    svg.appendChild(c);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",nx);t.setAttribute("y",ny+1);t.setAttribute("text-anchor","middle");
+    t.setAttribute("dominant-baseline","central");t.setAttribute("font-size","9");t.setAttribute("fill","#fff");
+    t.textContent="n⁰";svg.appendChild(t);
+  });
+  const shells=[{r:68,n:2},{r:90,n:8}];
+  shells.forEach(({r,n})=>{
+    const o=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    o.setAttribute("cx",cx);o.setAttribute("cy",cy);o.setAttribute("r",r);
+    o.setAttribute("fill","none");o.setAttribute("stroke","#BA7517");o.setAttribute("stroke-width","0.8");o.setAttribute("stroke-dasharray","3 3");
+    svg.appendChild(o);
+    for(let i=0;i<n;i++){
+      const angle=(2*Math.PI*i/n)-Math.PI/2;
+      const ex=cx+r*Math.cos(angle),ey=cy+r*Math.sin(angle);
+      const e=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      e.setAttribute("cx",ex.toFixed(1));e.setAttribute("cy",ey.toFixed(1));e.setAttribute("r","5");
+      e.setAttribute("fill","#E24B4A");svg.appendChild(e);
+    }
+  });
+  addLabel(svg,130,224,"Protonen (rot) + Neutronen (grau) + Elektronen");
+}
+function drawStandardmodell(svg){
+  const cx=130,cy=115,pr=18;
+  const nucleons=[
+    {x:cx-20,y:cy-10,color:"#D85A30",label:"p⁺",quarks:["u","u","d"]},
+    {x:cx+20,y:cy-10,color:"#888780",label:"n⁰",quarks:["u","d","d"]},
+    {x:cx,y:cy+16,color:"#888780",label:"n⁰",quarks:["u","d","d"]}
+  ];
+  const qColors={u:"#185FA5",d:"#D85A30"};
+  nucleons.forEach(({x,y,color,label,quarks})=>{
+    const bg=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    bg.setAttribute("cx",x);bg.setAttribute("cy",y);bg.setAttribute("r",pr);
+    bg.setAttribute("fill",color);bg.setAttribute("opacity","0.2");
+    svg.appendChild(bg);
+    const bc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    bc.setAttribute("cx",x);bc.setAttribute("cy",y);bc.setAttribute("r",pr);
+    bc.setAttribute("fill","none");bc.setAttribute("stroke",color);bc.setAttribute("stroke-width","1");
+    svg.appendChild(bc);
+    quarks.forEach((q,qi)=>{
+      const qa=(-Math.PI/2)+(qi*2*Math.PI/3);
+      const qx=x+(pr-7)*Math.cos(qa),qy=y+(pr-7)*Math.sin(qa);
+      const qc=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      qc.setAttribute("cx",qx.toFixed(1));qc.setAttribute("cy",qy.toFixed(1));qc.setAttribute("r","6");
+      qc.setAttribute("fill",qColors[q]);
+      svg.appendChild(qc);
+      const qt=document.createElementNS("http://www.w3.org/2000/svg","text");
+      qt.setAttribute("x",qx.toFixed(1));qt.setAttribute("y",(qy+1).toFixed(1));
+      qt.setAttribute("text-anchor","middle");qt.setAttribute("dominant-baseline","central");
+      qt.setAttribute("font-size","8");qt.setAttribute("fill","#fff");qt.textContent=q;
+      svg.appendChild(qt);
+    });
+  });
+  const shells=[{r:62,n:2},{r:88,n:6}];
+  shells.forEach(({r,n})=>{
+    const o=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    o.setAttribute("cx",cx);o.setAttribute("cy",cy);o.setAttribute("r",r);
+    o.setAttribute("fill","none");o.setAttribute("stroke","#BA7517");o.setAttribute("stroke-width","0.7");o.setAttribute("stroke-dasharray","3 3");
+    svg.appendChild(o);
+    for(let i=0;i<n;i++){
+      const angle=(2*Math.PI*i/n);
+      const ex=cx+r*Math.cos(angle),ey=cy+r*Math.sin(angle);
+      const e=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      e.setAttribute("cx",ex.toFixed(1));e.setAttribute("cy",ey.toFixed(1));e.setAttribute("r","4.5");
+      e.setAttribute("fill","#E24B4A");svg.appendChild(e);
+    }
+  });
+  addLabel(svg,130,234,"Quarks (blau=u, rot=d) in Protonen/Neutronen");
+}
+
+function addLabel(svg,x,y,text){
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  t.setAttribute("x",x);t.setAttribute("y",y);
+  t.setAttribute("text-anchor","middle");
+  t.setAttribute("font-size","11");
+  t.setAttribute("fill","var(--color-text-tertiary)");
+  t.textContent=text;
+  svg.appendChild(t);
+}
+
+function renderModel(idx){
+  const m=models[idx];
+  document.getElementById("ybadge").textContent=m.year;
+  const ep=document.getElementById("epill");
+  ep.textContent=m.era;ep.style.background=m.eraColor;ep.style.color=m.eraText;
+  const ct=document.getElementById("ctag");
+  ct.textContent=m.tag;ct.style.background=m.tagBg;ct.style.color=m.tagText;
+  document.getElementById("cname").textContent=m.name;
+  document.getElementById("csub").textContent=m.sub;
+  document.getElementById("cbody").textContent=m.body;
+  document.getElementById("askbtn").textContent="Mehr dazu ↗";
+  document.getElementById("askbtn").dataset.ask=m.ask;
+  const vis=document.getElementById("visarea");
+  vis.innerHTML="";
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("width","260");svg.setAttribute("height","260");
+  svg.setAttribute("viewBox","0 0 260 260");
+  m.draw(svg);
+  vis.appendChild(svg);
+  document.getElementById("prevbtn").disabled=idx===0;
+  document.getElementById("nextbtn").disabled=idx===models.length-1;
+  document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("active",i===idx));
+  document.getElementById("tslider").value=idx;
+}
+
+function go(dir){
+  cur=Math.max(0,Math.min(models.length-1,cur+dir));
+  renderModel(cur);
+}
+
+function askMore(){
+  const ask=document.getElementById("askbtn").dataset.ask;
+  sendPrompt(ask);
+}
+
+const dotrow=document.getElementById("dotrow");
+models.forEach((_,i)=>{
+  const d=document.createElement("div");
+  d.className="dot"+(i===0?" active":"");
+  d.onclick=()=>{cur=i;renderModel(i)};
+  dotrow.appendChild(d);
+});
+
+document.getElementById("tslider").addEventListener("input",e=>{
+  cur=parseInt(e.target.value);renderModel(cur);
+});
+
+renderModel(0);
+</script>

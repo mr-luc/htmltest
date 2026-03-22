@@ -1,70 +1,181 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meine GitHub Seite</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Naturwissenschaftliche Animationen</title>
   <style>
-    body {
-      margin: 0;
+    :root{
+      --bg1:#1e3c72;
+      --bg2:#2a5298;
+      --card: rgba(255,255,255,0.10);
+      --card2: rgba(255,255,255,0.14);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.85);
+      --accent: #ffcc00;
+      --accent2:#ffaa00;
+      --ring: rgba(255,204,0,0.45);
+    }
+
+    body{
+      margin:0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: white;
-      text-align: center;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      text-align:center;
     }
-    header {
-      padding: 60px 20px;
+
+    header{
+      padding: 56px 20px 28px;
+      max-width: 980px;
+      margin: 0 auto;
     }
-    h1 {
-      font-size: 3em;
+
+    h1{
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      margin: 0 0 10px;
+      letter-spacing: 0.2px;
+    }
+
+    header p{
+      margin: 0 auto;
+      max-width: 52ch;
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .container{
+      width: min(980px, 92vw);
+      margin: 0 auto 60px;
+    }
+
+    .box{
+      background: var(--card);
+      margin: 18px auto;
+      padding: 18px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat( auto-fit, minmax(220px, 1fr) );
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .card{
+      text-align:left;
+      background: var(--card2);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+      height: 100%;
+    }
+
+    .card:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .card h3{
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+    }
+
+    .card p{
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.98rem;
+    }
+
+    a.btn{
+      display:inline-block;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #111;
+      text-decoration: none;
+      font-weight: 700;
+      transition: .2s;
+      outline: none;
+      box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    }
+
+    a.btn:hover{ background: var(--accent2); }
+    a.btn:focus{ box-shadow: 0 0 0 4px var(--ring); }
+
+    .tag{
+      display:inline-block;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.9);
       margin-bottom: 10px;
     }
-    p {
-      font-size: 1.2em;
-    }
-    .box {
-      background: rgba(255,255,255,0.1);
-      margin: 20px auto;
-      padding: 20px;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-    }
-    button {
-      padding: 12px 25px;
-      border: none;
-      border-radius: 25px;
-      background: #ffcc00;
-      color: black;
-      font-size: 1em;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #ffaa00;
+
+    footer{
+      padding: 28px 20px 46px;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.95rem;
     }
   </style>
 </head>
+
 <body>
+  <header>
+    <h1>🔬 Naturwissenschaftliche Animationen</h1>
+    <p>
+      Kleine interaktive Simulationen und Visualisierungen (z. B. für Physik & Chemie) –
+      direkt im Browser, gehostet über GitHub Pages.
+    </p>
+  </header>
 
-<header>
-  <h1>🚀 Meine Website</h1>
-  <p>Gehostet mit GitHub Pages</p>
-</header>
+  <main class="container">
+    <section class="box" aria-label="Animationen">
+      <div class="tag">Animationen / Simulationen</div>
+      <div class="grid">
+        <article class="card">
+          <h3>Atomaufbau – Zeitleiste</h3>
+          <p>Entwicklung von Atommodellen als Zeitleiste (mit Schieberegler).</p>
+          <a class="btn" href="atomaufbau_zeitleiste_schieber.html">Starten</a>
+        </article>
 
-<div class="box">
-  <h2>Über mich</h2>
-  <p>Hier kannst du später Infos eintragen.</p>
-</div>
-<a href="atomaufbau_zeitleiste_schieber.html">
-  Zur Atomaufbau-Zeitleiste 🔬
-</a>
-<div class="box">
-  <h2>Mein erstes Projekt</h2>
-  <p>Hier kommen deine Inhalte rein.</p>
-  <button onclick="alert('Funktioniert! 😎')">Klick mich</button>
-</div>
+        <article class="card">
+          <h3>Demnächst: Optik</h3>
+          <p>Beispiel: Reflexion, Brechung, Linsen (Platzhalter-Kachel).</p>
+          <a class="btn" href="#" onclick="alert('Kommt bald!'); return false;">Bald</a>
+        </article>
 
+        <article class="card">
+          <h3>Demnächst: Mechanik</h3>
+          <p>Beispiel: Kräfte, Energie, Pendel (Platzhalter-Kachel).</p>
+          <a class="btn" href="#" onclick="alert('Kommt bald!'); return false;">Bald</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="box" aria-label="Info">
+      <h2 style="margin: 0 0 8px;">Über dieses Projekt</h2>
+      <p style="margin: 0; color: rgba(255,255,255,0.85); line-height: 1.55;">
+        Ziel: naturwissenschaftliche Inhalte verständlich machen – durch Animationen, die man selbst steuern kann.
+        Tipp: am PC oder im Querformat nutzen.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="year"></span> mr-luc · GitHub Pages
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

@@ -3,179 +3,572 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Naturwissenschaftliche Animationen</title>
+  <title>mr-luc · Naturwissenschaftliche Animationen</title>
   <style>
-    :root{
-      --bg1:#1e3c72;
-      --bg2:#2a5298;
-      --card: rgba(255,255,255,0.10);
-      --card2: rgba(255,255,255,0.14);
-      --text: #ffffff;
-      --muted: rgba(255,255,255,0.85);
-      --accent: #ffcc00;
-      --accent2:#ffaa00;
-      --ring: rgba(255,204,0,0.45);
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0b0f1a;
+      --surface:  rgba(255,255,255,0.055);
+      --surface2: rgba(255,255,255,0.085);
+      --border:   rgba(255,255,255,0.10);
+      --border2:  rgba(255,255,255,0.16);
+      --text:     #f0f4ff;
+      --muted:    rgba(240,244,255,0.60);
+      --accent:   #4f9cf9;
+      --accent2:  #a78bfa;
+      --accent3:  #34d399;
+      --glow:     rgba(79,156,249,0.18);
     }
 
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      text-align:center;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    header{
-      padding: 56px 20px 28px;
+    /* ── animated background ── */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,156,249,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 60% at 60% 30%, rgba(52,211,153,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── layout ── */
+    .page { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11,15,26,0.75);
+    }
+
+    .nav-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo span {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 96px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(79,156,249,0.10);
+      border: 1px solid rgba(79,156,249,0.22);
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.12rem;
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 52ch;
+      margin: 0 auto 36px;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    .chip {
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 6px 15px;
+      border-radius: 999px;
+      border: 1px solid var(--border2);
+      color: rgba(240,244,255,0.78);
+      background: var(--surface);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-icon { font-size: 1rem; }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.97rem;
+      text-decoration: none;
+      transition: opacity .2s, transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 24px rgba(79,156,249,0.28);
+    }
+
+    .hero-cta:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(79,156,249,0.38);
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-wrap {
       max-width: 980px;
       margin: 0 auto;
+      padding: 0 24px 80px;
     }
 
-    h1{
-      font-size: clamp(2rem, 3.5vw, 3.2rem);
-      margin: 0 0 10px;
-      letter-spacing: 0.2px;
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
-    header p{
-      margin: 0 auto;
-      max-width: 52ch;
-      font-size: 1.1rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .container{
-      width: min(980px, 92vw);
-      margin: 0 auto 60px;
-    }
-
-    .box{
-      background: var(--card);
-      margin: 18px auto;
-      padding: 18px;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: repeat( auto-fit, minmax(220px, 1fr) );
-      gap: 14px;
-      margin-top: 14px;
-    }
-
-    .card{
-      text-align:left;
-      background: var(--card2);
-      border-radius: 16px;
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
-      height: 100%;
-    }
-
-    .card:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,0.18);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-    }
-
-    .card h3{
-      margin: 0 0 6px;
-      font-size: 1.1rem;
-    }
-
-    .card p{
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 0.98rem;
-    }
-
-    a.btn{
-      display:inline-block;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #111;
-      text-decoration: none;
+    .section-head h2 {
+      font-size: 1.35rem;
       font-weight: 700;
-      transition: .2s;
-      outline: none;
-      box-shadow: 0 0 0 0 rgba(0,0,0,0);
     }
 
-    a.btn:hover{ background: var(--accent2); }
-    a.btn:focus{ box-shadow: 0 0 0 4px var(--ring); }
-
-    .tag{
-      display:inline-block;
-      font-size: 0.85rem;
-      padding: 4px 10px;
+    .section-count {
+      font-size: 0.82rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      color: rgba(255,255,255,0.9);
-      margin-bottom: 10px;
+      padding: 2px 10px;
     }
 
-    footer{
-      padding: 28px 20px 46px;
-      color: rgba(255,255,255,0.75);
-      font-size: 0.95rem;
+    /* ── CARDS GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
     }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(10px);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(79,156,249,0.06), rgba(167,139,250,0.04));
+      opacity: 0;
+      transition: opacity .18s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      background: var(--surface2);
+      border-color: rgba(255,255,255,0.20);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .card p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .tag-pill {
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .arrow-link {
+      font-size: 0.87rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap .15s;
+    }
+
+    .arrow-link:hover { gap: 8px; }
+
+    /* card states */
+    .card.live .card-icon { background: rgba(79,156,249,0.14); }
+    .card.soon { opacity: 0.62; pointer-events: none; }
+    .card.soon .card-icon { background: rgba(255,255,255,0.06); }
+
+    .badge-live {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.4px;
+      text-transform: uppercase;
+      background: rgba(52,211,153,0.14);
+      color: var(--accent3);
+      border: 1px solid rgba(52,211,153,0.22);
+      padding: 2px 9px; border-radius: 999px;
+    }
+
+    .badge-soon {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.4px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 9px; border-radius: 999px;
+    }
+
+    /* subject pills */
+    .pill-phys { background: rgba(79,156,249,0.14); color: #7ec8fb; }
+    .pill-chem { background: rgba(167,139,250,0.14); color: #c4b5fd; }
+    .pill-bio  { background: rgba(52,211,153,0.14); color: #6ee7b7; }
+    .pill-info { background: rgba(251,191,36,0.14); color: #fbbf24; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 24px 60px;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── ABOUT strip ── */
+    .about-strip {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 640px) {
+      .about-strip { grid-template-columns: 1fr; }
+      nav { padding: 16px 20px; }
+      .nav-links { gap: 18px; }
+    }
+
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 26px;
+      backdrop-filter: blur(10px);
+    }
+
+    .about-card h3 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .about-card p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: rgba(240,244,255,0.75);
+    }
+
+    .subject-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .subject-chip {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 28px 24px 44px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>🔬 Naturwissenschaftliche Animationen</h1>
-    <p>
-      Kleine interaktive Simulationen und Visualisierungen (z. B. für Physik & Chemie) –
-      direkt im Browser, gehostet über GitHub Pages.
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <span>🔬</span>
+      mr-luc
+    </a>
+    <ul class="nav-links">
+      <li><a href="#animationen">Animationen</a></li>
+      <li><a href="#about">Über mich</a></li>
+      <li><a href="https://github.com/mr-luc" target="_blank" rel="noopener">GitHub ↗</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">Interaktive Lerntools</div>
+
+    <h1>
+      Naturwissenschaften<br>
+      <span class="grad">im Browser erleben.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Animationen und Simulationen für Physik, Chemie, Biologie und Informatik –
+      direkt steuerbar, ohne Installation, für den Unterricht und zum Selbstentdecken.
     </p>
-  </header>
 
-  <main class="container">
-    <section class="box" aria-label="Animationen">
-      <div class="tag">Animationen / Simulationen</div>
-      <div class="grid">
-        <article class="card">
-          <h3>Atomaufbau – Zeitleiste</h3>
-          <p>Entwicklung von Atommodellen als Zeitleiste (mit Schieberegler).</p>
-          <a class="btn" href="atomaufbau_zeitleiste_schieber.html">Starten</a>
-        </article>
+    <div class="hero-chips">
+      <span class="chip"><span class="chip-icon">⚛️</span> Physik</span>
+      <span class="chip"><span class="chip-icon">🧪</span> Chemie</span>
+      <span class="chip"><span class="chip-icon">🌿</span> Biologie</span>
+      <span class="chip"><span class="chip-icon">💻</span> Informatik</span>
+    </div>
 
-        <article class="card">
-          <h3>Demnächst: Optik</h3>
-          <p>Beispiel: Reflexion, Brechung, Linsen (Platzhalter-Kachel).</p>
-          <a class="btn" href="#" onclick="alert('Kommt bald!'); return false;">Bald</a>
-        </article>
+    <a class="hero-cta" href="#animationen">
+      Animationen entdecken
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </section>
 
-        <article class="card">
-          <h3>Demnächst: Mechanik</h3>
-          <p>Beispiel: Kräfte, Energie, Pendel (Platzhalter-Kachel).</p>
-          <a class="btn" href="#" onclick="alert('Kommt bald!'); return false;">Bald</a>
-        </article>
+  <!-- ANIMATIONEN -->
+  <section class="section-wrap" id="animationen">
+    <div class="section-head">
+      <h2>Animationen</h2>
+      <span class="section-count">3 gesamt · 1 live</span>
+    </div>
+
+    <div class="grid">
+
+      <!-- live -->
+      <a class="card live" href="atomaufbau_zeitleiste_schieber.html">
+        <div class="card-meta">
+          <div class="card-icon">⚛️</div>
+          <span class="badge-live">Live</span>
+        </div>
+        <h3>Atomaufbau – Zeitleiste</h3>
+        <p>Von Demokrit bis zum Standardmodell: Atommodelle als interaktive Zeitleiste mit Schieberegler und SVG-Visualisierungen.</p>
+        <div class="card-footer">
+          <span class="tag-pill pill-chem">Chemie / Physik</span>
+          <span class="arrow-link">Starten →</span>
+        </div>
+      </a>
+
+      <!-- soon: Optik -->
+      <div class="card soon">
+        <div class="card-meta">
+          <div class="card-icon">🔭</div>
+          <span class="badge-soon">Demnächst</span>
+        </div>
+        <h3>Optik – Reflexion & Brechung</h3>
+        <p>Lichtbrechung, Reflexion und Linsengesetze interaktiv simuliert.</p>
+        <div class="card-footer">
+          <span class="tag-pill pill-phys">Physik</span>
+        </div>
       </div>
-    </section>
 
-    <section class="box" aria-label="Info">
-      <h2 style="margin: 0 0 8px;">Über dieses Projekt</h2>
-      <p style="margin: 0; color: rgba(255,255,255,0.85); line-height: 1.55;">
-        Ziel: naturwissenschaftliche Inhalte verständlich machen – durch Animationen, die man selbst steuern kann.
-        Tipp: am PC oder im Querformat nutzen.
+      <!-- soon: Mechanik -->
+      <div class="card soon">
+        <div class="card-meta">
+          <div class="card-icon">⚙️</div>
+          <span class="badge-soon">Demnächst</span>
+        </div>
+        <h3>Mechanik – Kräfte & Energie</h3>
+        <p>Kräfte, Energie und Pendelbewegungen als steuerbare Simulation.</p>
+        <div class="card-footer">
+          <span class="tag-pill pill-phys">Physik</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section class="about-strip" id="about">
+    <div class="about-card">
+      <h3>Über das Projekt</h3>
+      <p>
+        Ziel ist es, naturwissenschaftliche Konzepte durch Interaktivität greifbarer zu machen –
+        als Unterrichtsmaterial oder zum eigenständigen Entdecken.
+        Alle Animationen laufen direkt im Browser, ohne Plugins oder Anmeldung.
       </p>
-    </section>
-  </main>
+    </div>
+    <div class="about-card">
+      <h3>Fächer & Themen</h3>
+      <div class="subject-list">
+        <span class="subject-chip pill-phys">⚛️ Physik</span>
+        <span class="subject-chip pill-chem">🧪 Chemie</span>
+        <span class="subject-chip pill-bio">🌿 Biologie</span>
+        <span class="subject-chip pill-info">💻 Informatik</span>
+      </div>
+    </div>
+  </section>
 
+  <!-- FOOTER -->
   <footer>
-    © <span id="year"></span> mr-luc · GitHub Pages
+    © <span id="year"></span> mr-luc ·
+    <a href="https://github.com/mr-luc" target="_blank" rel="noopener">GitHub</a>
+    · GitHub Pages
   </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
